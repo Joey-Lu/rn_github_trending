@@ -3,6 +3,11 @@ import Home from '../pages/Home';
 import Detail from '../pages/Detail';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
+import {connect} from 'react-redux';
+import {
+  createReactNavigationReduxMiddleware,
+  createReduxContainer,
+} from 'react-navigation-redux-helpers';
 
 const InitNavigator = createStackNavigator({
   WelcomePage: {
@@ -27,7 +32,10 @@ const MainNavigator = createStackNavigator({
     },
   },
 });
-const AppContainer = createAppContainer(
+
+export const rootCom = 'Init';
+
+export const AppContainer = createAppContainer(
   createSwitchNavigator(
     {
       Init: InitNavigator,
@@ -41,4 +49,15 @@ const AppContainer = createAppContainer(
   ),
 );
 
-export default AppContainer;
+export const middleware = createReactNavigationReduxMiddleware(
+  state => state.nav,
+  'root',
+);
+
+const AppWithNavigationState = createReduxContainer(AppContainer, 'root');
+
+const mapStateToProps = state => ({
+  state: state.nav,
+});
+
+export default connect(mapStateToProps)(AppWithNavigationState);

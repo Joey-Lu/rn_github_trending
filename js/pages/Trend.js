@@ -1,24 +1,25 @@
 import React from 'react';
 import {View, Text, Button} from 'react-native';
+import {connect} from 'react-redux';
+import actions from '../action';
 
 const Trend = props => {
-  const {navigation} = props; 
+  const {navigation, onThemeChange} = props;
   return (
     <View>
       <Text>trend</Text>
-      <Button
-        title="change color"
-        onPress={() => {
-          navigation.setParams({
-            theme: {
-              tintColor: 'red',
-              updateTime: new Date().getTime(),
-            },
-          });
-        }}
-      />
+      <Button title="change color" onPress={() => onThemeChange('#096')} />
     </View>
   );
 };
 
-export default Trend;
+const mapStateToProps = state => ({});
+
+const mapDispatchToProps = dispatch => ({
+  onThemeChange: theme => dispatch(actions.onThemeChange(theme)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Trend);

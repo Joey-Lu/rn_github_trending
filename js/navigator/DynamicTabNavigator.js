@@ -9,6 +9,7 @@ import AboutMe from '../pages//AboutMe';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import NavigationUtil from './NavigationUtil';
+import {connect} from 'react-redux';
 
 const TABS = {
   PopularPage: {
@@ -55,30 +56,16 @@ const TABS = {
 };
 
 const TabBarComponent = props => {
-  const [theme, setTheme] = useState(
-    () => ({
-      tintColor: props.activeTintColor,
-      updateTime: new Date().getTime(),
-    }),
-    [props],
-  );
-  const {routes, index} = props.navigation.state;
+  const [theme, setTheme] = useState({
+    tintColor: props.activeTintColor,
+    updateTime: new Date().getTime(),
+  });
 
   useEffect(() => {
-    if (routes[index].params) {
-      const {theme: routerTheme} = routes[index].params;
-      if (routerTheme && routerTheme.updateTime > theme.updateTime) {
-        setTheme(routerTheme);
-      }
-    }
-  }, [routes, index, theme]);
+    props.theme && setTheme(props.theme);
+  }, [props.theme]);
 
-  return (
-    <BottomTabBar
-      {...props}
-      activeTintColor={theme.tintColor || props.activeTintColor}
-    />
-  );
+  return <BottomTabBar {...props} activeTintColor={theme} />;
 };
 
 const DynamicTabNavigator = props => {
@@ -87,7 +74,9 @@ const DynamicTabNavigator = props => {
     const tabs = {PopularPage, TrendPage, FavoritePage, AboutMePage};
     return createAppContainer(
       createBottomTabNavigator(tabs, {
-        tabBarComponent: TabBarComponent,
+        tabBarComponent: _props => (
+          <TabBarComponent theme={props.theme} {..._props} />
+        ),
       }),
     );
   };
@@ -99,4 +88,8 @@ const DynamicTabNavigator = props => {
 
 const styles = StyleSheet.create({});
 
-export default DynamicTabNavigator;
+const mapStateToProps = state => ({
+  theme: state.theme.theme,
+});
+
+export default connect(mapStateToProps)(DynamicTabNavigator);
