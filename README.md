@@ -1,2 +1,2 @@
 # rn_github_trending
-A React-native version of Github app 
+A React-native version of Github Trending
