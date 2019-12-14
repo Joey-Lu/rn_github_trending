@@ -1,22 +1,41 @@
-import React from 'react';
-import {StyleSheet, View, Text} from 'react-native';
-import {createAppContainer} from 'react-navigation';
-import {createBottomTabNavigator} from 'react-navigation-tabs';
-import Favorite from './Favorite';
-import Popular from './Popular';
-import Trend from './Trend';
-import AboutMe from './AboutMe';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import React, {useEffect} from 'react';
+import {StyleSheet} from 'react-native';
+import {BackHandler} from 'react-native';
+import {NavigationActions} from 'react-navigation';
 import NavigationUtil from '../navigator/NavigationUtil';
 import DynamicTabNavigator from '../navigator/DynamicTabNavigator';
+import {connect} from 'react-redux';
 
 const Home = props => {
   NavigationUtil.navigation = props.navigation;
 
+  const onBackPress = () => {
+    const {dispatch, nav} = props;
+    if (nav.routes[1].index === 0) {
+      return false;
+    }
+    dispatch(NavigationActions.back());
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    };
+  });
+
   return <DynamicTabNavigator />;
 };
 
+const mapStateToProps = state => ({
+  nav: state.nav,
+});
+
+const mapDispatchToProps = dispatch => ({
+  dispatch,
+});
+
 const styles = StyleSheet.create({});
 
-export default Home;
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
