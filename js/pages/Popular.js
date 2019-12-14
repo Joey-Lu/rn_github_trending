@@ -109,12 +109,13 @@ const PopularTab = props => {
         }
         ListFooterComponent={() => genIndicator()}
         onEndReached={() => {
-          setTimeout(() => {
-            if (canLoadMore) {
-              fetchData(true);
-              setCanLoadMore(false);
-            }
-          }, 100);
+          fetchData(true);
+          // setTimeout(() => {
+          //   if (canLoadMore) {
+          //     fetchData(true);
+          //     setCanLoadMore(false);
+          //   }
+          // }, 100);
         }}
         onEndReachedThreshold={0.5}
         onMomentumScrollBegin={() => setCanLoadMore(true)}

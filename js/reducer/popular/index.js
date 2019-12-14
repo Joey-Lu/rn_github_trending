@@ -38,7 +38,7 @@ export default function onAction(state = defaultState, action) {
         ...state,
         [action.storeName]: {
           ...state[action.storeName],
-          projectModes: action.projetModes,
+          projectModes: action.projectModes,
           hideLoadingMore: false,
           pageIndex: action.pageIndex,
         },
