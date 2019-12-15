@@ -8,6 +8,7 @@ import {
   createReactNavigationReduxMiddleware,
   createReduxContainer,
 } from 'react-navigation-redux-helpers';
+import NavigationBar from "../common/NavigationBar";
 
 const InitNavigator = createStackNavigator({
   WelcomePage: {

@@ -8,15 +8,16 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
-import {createAppContainer} from 'react-navigation';
+import {createAppContainer, ThemeColors} from 'react-navigation';
 import {createMaterialTopTabNavigator} from 'react-navigation-tabs';
 import Toast from 'react-native-easy-toast';
 import actions from '../action';
 import PopularItem from '../common/PopularItem';
+import NavigationBar from '../common/NavigationBar';
 
 const URL = 'http://api.github.com/search/repositories?q=';
 const QUERY_KEY = '&sort=stars';
-const THEME_COLOR = 'red';
+const THEME_COLOR = '#678';
 
 const tabNames = [
   'Java',
@@ -109,13 +110,12 @@ const PopularTab = props => {
         }
         ListFooterComponent={() => genIndicator()}
         onEndReached={() => {
-          fetchData(true);
-          // setTimeout(() => {
-          //   if (canLoadMore) {
-          //     fetchData(true);
-          //     setCanLoadMore(false);
-          //   }
-          // }, 100);
+          setTimeout(() => {
+            if (canLoadMore) {
+              fetchData(true);
+              setCanLoadMore(false);
+            }
+          }, 100);
         }}
         onEndReachedThreshold={0.5}
         onMomentumScrollBegin={() => setCanLoadMore(true)}
@@ -153,8 +153,17 @@ const Popular = props => {
       },
     }),
   );
+
   return (
     <View style={styles.container}>
+      <NavigationBar
+        title="Most popular"
+        statusBar={{
+          backgroundColor: THEME_COLOR,
+          barStyle: 'light-content',
+        }}
+        style={{backgroundColor: THEME_COLOR}}
+      />
       <TopNavigator />
     </View>
   );
