@@ -2,7 +2,7 @@ import actionTypes from '../actionTypes';
 import DataStore, {FLAG_STORAGE} from '../../expand/dao/DataStore';
 import {handleData} from '../ActionUtil';
 
-export const onLoadMorePopular = (
+export const onLoadMoreTrending = (
   storeName,
   pageIndex,
   pageSize,
@@ -16,7 +16,7 @@ export const onLoadMorePopular = (
           callback('no more data');
         }
         dispatch({
-          type: actionTypes.POPULAR_LOAD_MORE_FAIL,
+          type: actionTypes.TRENDING_LOAD_MORE_FAIL,
           error: 'no more data',
           storeName,
           pageIndex: --pageIndex,
@@ -27,7 +27,7 @@ export const onLoadMorePopular = (
             ? dataArray.length
             : pageSize * pageIndex;
         dispatch({
-          type: actionTypes.POPULAR_LOAD_MORE_SUCCESS,
+          type: actionTypes.TRENDING_LOAD_MORE_SUCCESS,
           storeName,
           pageIndex,
           projectModes: dataArray.slice(0, max),
@@ -37,18 +37,18 @@ export const onLoadMorePopular = (
   };
 };
 
-export const onLoadPopularData = (storeName, url, pageSize) => {
+export const onLoadTrendingData = (storeName, url, pageSize) => {
   return dispatch => {
     dispatch({
-      type: actionTypes.POPULAR_REFRESH,
+      type: actionTypes.TRENDING_REFRESH,
       storeName,
     });
     let dataStore = new DataStore();
     dataStore
-      .fetchData(url, FLAG_STORAGE.flag_popular) //async call
+      .fetchData(url, FLAG_STORAGE.flag_trend) //async call
       .then(data => {
         handleData(
-          actionTypes.POPULAR_REFRESH_SUCCESS,
+          actionTypes.TRENDING_REFRESH_SUCCESS,
           dispatch,
           storeName,
           data,
@@ -58,7 +58,7 @@ export const onLoadPopularData = (storeName, url, pageSize) => {
       .catch(err => {
         console.log(err);
         dispatch({
-          type: actionTypes.POPULAR_REFRESH_FAIL,
+          type: actionTypes.TRENDING_REFRESH_FAIL,
           storeName,
           err,
         });

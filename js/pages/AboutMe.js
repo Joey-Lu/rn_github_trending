@@ -6,7 +6,6 @@ import NavigationBar from '../common/NavigationBar';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const AboutMe = props => {
-
   const getRightButton = () => {
     return (
       <View style={{flexDirection: 'row'}}>

@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
+import GitHubTrending from 'GitHubTrending';
+export const FLAG_STORAGE = {flag_popular: 'popular', flag_trend: 'trending'};
 
 export default class DataStore {
   saveData(url, data, callback) {
@@ -61,22 +63,37 @@ export default class DataStore {
     });
   }
 
-  fetchRemoteData(url) {
+  fetchRemoteData(url, flag) {
     return new Promise((resolve, reject) => {
-      fetch(url)
-        .then(res => {
-          if (res.ok) {
-            return res.json();
-          }
-          throw new Error('Network has no response');
-        })
-        .then(data => {
-          this.saveData(url, data);
-          resolve(data);
-        })
-        .catch(err => {
-          reject(err);
-        });
+      if (flag !== FLAG_STORAGE.flag_trend) {
+        fetch(url)
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Network response was not ok.');
+          })
+          .then(responseData => {
+            this.saveData(url, responseData);
+            resolve(responseData);
+          })
+          .catch(error => {
+            reject(error);
+          });
+      } else {
+        new GitHubTrending()
+          .fetchTrending(url)
+          .then(items => {
+            if (!items) {
+              throw new Error('responseData is null');
+            }
+            this.saveData(url, items);
+            resolve(items);
+          })
+          .catch(error => {
+            reject(error);
+          });
+      }
     });
   }
 

@@ -4,7 +4,7 @@ import {createAppContainer} from 'react-navigation';
 import {createBottomTabNavigator, BottomTabBar} from 'react-navigation-tabs';
 import Favorite from '../pages/Favorite';
 import Popular from '../pages/Popular';
-import Trend from '../pages/Trend';
+import Trending from '../pages/Trending';
 import AboutMe from '../pages//AboutMe';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -22,7 +22,7 @@ const TABS = {
     },
   },
   TrendPage: {
-    screen: Trend,
+    screen: Trending,
     navigationOptions: {
       tabBarLabel: 'Trending',
       tabBarIcon: ({tintColor, focused}) => (
