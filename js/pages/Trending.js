@@ -6,6 +6,7 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import {connect} from 'react-redux';
 import {createAppContainer} from 'react-navigation';
@@ -14,6 +15,8 @@ import Toast from 'react-native-easy-toast';
 import actions from '../action';
 import TrendingItem from '../common/TrendingItem';
 import NavigationBar from '../common/NavigationBar';
+import TrendingDialog, {timeSpans} from '../common/TrendingDialog';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const URL = 'https://github.com/trending/';
 const THEME_COLOR = '#678';
@@ -45,7 +48,9 @@ const TrendingTab = props => {
   };
 
   const genFetchUrl = key => {
-    return URL + key + '?since=daily';
+    return key === 'All'
+      ? `https://github.com/trending/`
+      : URL + key + '?since=daily';
   };
 
   const genIndicator = () => {
@@ -118,6 +123,9 @@ const TrendingTab = props => {
 };
 
 const Trending = props => {
+  const DialogRef = useRef();
+  const [timeSpan, setTimeSpan] = useState(timeSpans[0]);
+
   const _generateTabs = () => {
     const tabs = {};
     tabNames.forEach((item, index) => {
@@ -146,10 +154,47 @@ const Trending = props => {
     }),
   );
 
+  const createTitleView = () => {
+    return (
+      <View>
+        <TouchableOpacity
+          underlayColor="transparent"
+          onPress={() => DialogRef.current.show()}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text
+              style={{
+                fontSize: 18,
+                color: '#FFFFFF',
+                fontWeight: '400',
+              }}>
+              Trending {timeSpan.showText}
+            </Text>
+            <MaterialIcons
+              name={'arrow-drop-down'}
+              size={22}
+              style={{color: 'white'}}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const createTrendingDialog = () => {
+    return (
+      <TrendingDialog ref={DialogRef} onSelect={tab => onSelectTimeSpan(tab)} />
+    );
+  };
+
+  const onSelectTimeSpan = tab => {
+    DialogRef.current.dismiss();
+    setTimeSpan(tab);
+  };
   return (
     <View style={styles.container}>
       <NavigationBar
         title="Trending"
+        titleView={createTitleView()}
         statusBar={{
           backgroundColor: THEME_COLOR,
           barStyle: 'light-content',
@@ -157,6 +202,7 @@ const Trending = props => {
         style={{backgroundColor: THEME_COLOR}}
       />
       <TopNavigator />
+      {createTrendingDialog()}
     </View>
   );
 };
