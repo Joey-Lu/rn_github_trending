@@ -14,10 +14,15 @@ import Toast from 'react-native-easy-toast';
 import actions from '../action';
 import PopularItem from '../common/PopularItem';
 import NavigationBar from '../common/NavigationBar';
+import NavigationUtil from '../navigator/NavigationUtil';
+import FavoriteDao from '../expand/FavoriteDao';
+import {FLAG_STORAGE} from '../expand/dao/DataStore';
+import FavoriteUtil from '../util/FavoriteUtil';
 
 const URL = 'http://api.github.com/search/repositories?q=';
 const QUERY_KEY = '&sort=stars';
 const THEME_COLOR = '#678';
+const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 
 const tabNames = [
   'Java',
@@ -29,35 +34,28 @@ const tabNames = [
 ];
 
 const PopularTab = props => {
-  const {
-    tabLabel: storeName,
-    onLoadPopularData,
-    onLoadMorePopular,
-    popular,
-  } = props;
+  const {tabLabel, onLoadPopularData, onLoadMorePopular, popular} = props;
+
+  const [storeName, setStoreName] = useState(tabLabel);
   const [pageSize, setPageSize] = useState(10);
   const [canLoadMore, setCanLoadMore] = useState(true);
   const toastRef = useRef();
-
-  const _store = () => {
-    let store = popular[storeName];
-    if (!store) {
-      store = {
-        items: [],
-        isLoading: false,
-        projectModels: [],
-        hideLoadingMore: true,
-      };
-    }
-    return store;
-  };
+  const [store, setStore] = useState({
+    items: [],
+    isLoading: false,
+    projectModes: [],
+    hideLoadingMore: true,
+  });
+  useEffect(() => {
+    setStore(popular[storeName]);
+  }, [popular, storeName]);
 
   const genFetchUrl = key => {
     return URL + key + QUERY_KEY;
   };
 
   const genIndicator = () => {
-    return _store().hideLoadingMore ? null : (
+    return store && store.hideLoadingMore ? null : (
       <View style={styles.indicatorContainer}>
         <ActivityIndicator style={styles.indicator} />
         <Text>Load more</Text>
@@ -66,44 +64,60 @@ const PopularTab = props => {
   };
 
   const fetchData = loadMore => {
-    const store = _store();
     const url = genFetchUrl(storeName);
     if (loadMore) {
       onLoadMorePopular(
         storeName,
-        ++_store().pageIndex,
+        ++store.pageIndex,
         pageSize,
-        _store().items,
+        store.items,
+        favoriteDao,
         () => {
           toastRef.current.show('No more data');
         },
       );
     } else {
-      onLoadPopularData(storeName, url, pageSize);
+      onLoadPopularData(storeName, url, pageSize, favoriteDao);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const url = genFetchUrl(storeName);
+    onLoadPopularData(storeName, url, pageSize, favoriteDao);
+  }, [onLoadPopularData, pageSize, storeName]);
 
   const renderItem = data => {
     const item = data.item;
-    return <PopularItem item={item} onSelect={() => {}} />;
+    return (
+      <PopularItem
+        projectModes={item}
+        onSelect={() => {
+          NavigationUtil.toPage({projectModes: item}, 'DetailPage');
+        }}
+        onFavorite={(item, isFavorite) =>
+          FavoriteUtil.onFavorite(
+            favoriteDao,
+            item,
+            isFavorite,
+            FLAG_STORAGE.flag_popular,
+          )
+        }
+      />
+    );
   };
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={_store().projectModes}
+        data={store && store.projectModes}
         renderItem={data => renderItem(data)}
-        keyExtractor={item => '' + item.id}
+        keyExtractor={item => '' + item.item.id}
         refreshControl={
           <RefreshControl
             title="Loading..."
             titleColor={THEME_COLOR}
             colors={[THEME_COLOR]}
-            refreshing={_store().isLoading}
+            refreshing={store && store.isLoading}
             onRefresh={() => fetchData()}
             tintColor={THEME_COLOR}
           />
@@ -198,15 +212,23 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  onLoadPopularData: (storeName, url, pageSize) =>
-    dispatch(actions.onLoadPopularData(storeName, url, pageSize)),
-  onLoadMorePopular: (storeName, pageIndex, pageSize, items, callback) =>
+  onLoadPopularData: (storeName, url, pageSize, favoriteDao) =>
+    dispatch(actions.onLoadPopularData(storeName, url, pageSize, favoriteDao)),
+  onLoadMorePopular: (
+    storeName,
+    pageIndex,
+    pageSize,
+    items,
+    favoriteDao,
+    callback,
+  ) =>
     dispatch(
       actions.onLoadMorePopular(
         storeName,
         pageIndex,
         pageSize,
         items,
+        favoriteDao,
         callback,
       ),
     ),

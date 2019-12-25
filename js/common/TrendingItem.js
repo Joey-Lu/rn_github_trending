@@ -1,23 +1,18 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import HTMLView from 'react-native-htmlview';
-
-const FavoriteButton = props => {
-  return (
-    <TouchableOpacity
-      onPress={() => {}}
-      style={{padding: 6}}
-      underlayColor={'transparent'}>
-      <FontAwesome name="star-o" size={26} style={{color: 'red'}} />
-    </TouchableOpacity>
-  );
-};
+import BaseItem from './BaseItem';
 
 const TrendingItem = props => {
-  const {item, onSelect} = props;
+  const {projectModes, onSelect, onFavorite} = props;
+  const [item, setItem] = useState(projectModes.item);
+
+  useEffect(() => {
+    setItem(projectModes.item);
+  }, [projectModes]);
   return (
-    <TouchableOpacity onPress={() => {}}>
+    <TouchableOpacity onPress={onSelect}>
       <View style={styles.container}>
         <Text style={styles.title}>{item.fullName}</Text>
         <HTMLView
@@ -45,7 +40,11 @@ const TrendingItem = props => {
             <Text>Start:</Text>
             <Text>{item.starCount}</Text>
           </View>
-          <FavoriteButton />
+          <BaseItem
+            projectModes={projectModes}
+            isFavorite={projectModes.isFavorite}
+            onFavorite={onFavorite}
+          />
         </View>
       </View>
     </TouchableOpacity>

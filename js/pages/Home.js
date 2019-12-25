@@ -5,9 +5,12 @@ import {NavigationActions} from 'react-navigation';
 import NavigationUtil from '../navigator/NavigationUtil';
 import DynamicTabNavigator from '../navigator/DynamicTabNavigator';
 import {connect} from 'react-redux';
+import BackPress from '../common/BackPress';
 
 const Home = props => {
   NavigationUtil.navigation = props.navigation;
+
+  const backPress = new BackPress({backPress: onBackPress});
 
   const onBackPress = () => {
     const {dispatch, nav} = props;
@@ -19,9 +22,9 @@ const Home = props => {
   };
 
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    backPress.componentDidMount();
     return () => {
-      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+      backPress.componentWillUnmount();
     };
   });
 

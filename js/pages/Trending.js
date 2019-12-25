@@ -17,44 +17,47 @@ import TrendingItem from '../common/TrendingItem';
 import NavigationBar from '../common/NavigationBar';
 import TrendingDialog, {timeSpans} from '../common/TrendingDialog';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import NavigationUtil from '../navigator/NavigationUtil';
+import FavoriteUtil from '../util/FavoriteUtil';
+import FavoriteDao from '../expand/FavoriteDao';
+import {FLAG_STORAGE} from '../expand/dao/DataStore';
 
 const URL = 'https://github.com/trending/';
 const THEME_COLOR = '#678';
-
+const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trend);
 const tabNames = ['All', 'C', 'C#', 'Javascript', 'PHP'];
 
 const TrendingTab = props => {
   const {
-    tabLabel: storeName,
+    timeSpan,
+    tabLabel,
     onLoadTrendingData,
     onLoadMoreTrending,
     trending,
   } = props;
   const [pageSize, setPageSize] = useState(10);
   const [canLoadMore, setCanLoadMore] = useState(true);
+  const [storeName, setStoreName] = useState(tabLabel);
   const toastRef = useRef();
 
-  const _store = () => {
-    let store = trending[storeName];
-    if (!store) {
-      store = {
-        items: [],
-        isLoading: false,
-        projectModels: [],
-        hideLoadingMore: true,
-      };
-    }
-    return store;
-  };
+  const [store, setStore] = useState({
+    items: [],
+    isLoading: false,
+    projectModes: [],
+    hideLoadingMore: true,
+  });
+  useEffect(() => {
+    setStore(trending[storeName]);
+  }, [trending, storeName]);
 
   const genFetchUrl = key => {
     return key === 'All'
       ? `https://github.com/trending/`
-      : URL + key + '?since=daily';
+      : URL + key + '?' + timeSpan.searchText;
   };
 
   const genIndicator = () => {
-    return _store().hideLoadingMore ? null : (
+    return store && store.hideLoadingMore ? null : (
       <View style={styles.indicatorContainer}>
         <ActivityIndicator style={styles.indicator} />
         <Text>Load more</Text>
@@ -63,44 +66,60 @@ const TrendingTab = props => {
   };
 
   const fetchData = loadMore => {
-    const store = _store();
     const url = genFetchUrl(storeName);
     if (loadMore) {
       onLoadMoreTrending(
         storeName,
-        ++_store().pageIndex,
+        ++store.pageIndex,
         pageSize,
-        _store().items,
+        store.items,
+        favoriteDao,
         () => {
           toastRef.current.show('No more data');
         },
       );
     } else {
-      onLoadTrendingData(storeName, url, pageSize);
+      onLoadTrendingData(storeName, url, pageSize, favoriteDao);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const url = genFetchUrl(storeName);
+    onLoadTrendingData(storeName, url, pageSize, favoriteDao);
+  }, [onLoadTrendingData, pageSize, storeName]);
 
   const renderItem = data => {
     const item = data.item;
-    return <TrendingItem item={item} onSelect={() => {}} />;
+    return (
+      <TrendingItem
+        projectModes={item}
+        onSelect={() => {
+          NavigationUtil.toPage({projectModes: item}, 'DetailPage');
+        }}
+        onFavorite={(item, isFavorite) => {
+          FavoriteUtil.onFavorite(
+            favoriteDao,
+            item,
+            isFavorite,
+            FLAG_STORAGE.flag_trend,
+          );
+        }}
+      />
+    );
   };
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={_store().projectModes}
+        data={store && store.projectModes}
         renderItem={data => renderItem(data)}
-        keyExtractor={item => '' + item.fullName}
+        keyExtractor={item => '' + item.item.fullName}
         refreshControl={
           <RefreshControl
             title="Loading..."
             titleColor={THEME_COLOR}
             colors={[THEME_COLOR]}
-            refreshing={_store().isLoading}
+            refreshing={store && store.isLoading}
             onRefresh={() => fetchData()}
             tintColor={THEME_COLOR}
           />
@@ -123,14 +142,16 @@ const TrendingTab = props => {
 };
 
 const Trending = props => {
-  const DialogRef = useRef();
   const [timeSpan, setTimeSpan] = useState(timeSpans[0]);
+  const [visible, setVisible] = useState(false);
 
   const _generateTabs = () => {
     const tabs = {};
     tabNames.forEach((item, index) => {
       tabs[`tab${index}`] = {
-        screen: props => <TrendingTabPage {...props} tabLabel={item} />,
+        screen: props => (
+          <TrendingTabPage timeSpan={timeSpan} {...props} tabLabel={item} />
+        ),
         navigationOptions: {
           title: item,
         },
@@ -157,18 +178,9 @@ const Trending = props => {
   const createTitleView = () => {
     return (
       <View>
-        <TouchableOpacity
-          underlayColor="transparent"
-          onPress={() => DialogRef.current.show()}>
+        <TouchableOpacity underlayColor="transparent" onPress={() => show()}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text
-              style={{
-                fontSize: 18,
-                color: '#FFFFFF',
-                fontWeight: '400',
-              }}>
-              Trending {timeSpan.showText}
-            </Text>
+            <Text style={styles.title}>Trending {timeSpan.showText}</Text>
             <MaterialIcons
               name={'arrow-drop-down'}
               size={22}
@@ -180,16 +192,30 @@ const Trending = props => {
     );
   };
 
-  const createTrendingDialog = () => {
-    return (
-      <TrendingDialog ref={DialogRef} onSelect={tab => onSelectTimeSpan(tab)} />
-    );
+  const show = () => {
+    setVisible(true);
+  };
+
+  const dismiss = () => {
+    setVisible(false);
   };
 
   const onSelectTimeSpan = tab => {
-    DialogRef.current.dismiss();
+    dismiss();
     setTimeSpan(tab);
   };
+
+  const createTrendingDialog = () => {
+    return (
+      <TrendingDialog
+        visible={visible}
+        onDismiss={dismiss}
+        onShow={show}
+        onSelect={tab => onSelectTimeSpan(tab)}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
       <NavigationBar
@@ -210,6 +236,11 @@ const Trending = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  title: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    fontWeight: '400',
   },
   tabStyle: {
     minWidth: 50,
@@ -236,15 +267,23 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  onLoadTrendingData: (storeName, url, pageSize) =>
-    dispatch(actions.onLoadTrendingData(storeName, url, pageSize)),
-  onLoadMoreTrending: (storeName, pageIndex, pageSize, items, callback) =>
+  onLoadTrendingData: (storeName, url, pageSize, favoriteDao) =>
+    dispatch(actions.onLoadTrendingData(storeName, url, pageSize, favoriteDao)),
+  onLoadMoreTrending: (
+    storeName,
+    pageIndex,
+    pageSize,
+    items,
+    favoriteDao,
+    callback,
+  ) =>
     dispatch(
       actions.onLoadMoreTrending(
         storeName,
         pageIndex,
         pageSize,
         items,
+        favoriteDao,
         callback,
       ),
     ),

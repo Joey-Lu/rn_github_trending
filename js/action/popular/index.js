@@ -1,12 +1,13 @@
 import actionTypes from '../actionTypes';
 import DataStore, {FLAG_STORAGE} from '../../expand/dao/DataStore';
-import {handleData} from '../ActionUtil';
+import {handleData, _projectModels} from '../ActionUtil';
 
 export const onLoadMorePopular = (
   storeName,
   pageIndex,
   pageSize,
   dataArray = [],
+  favoriteDao,
   callback,
 ) => {
   return dispatch => {
@@ -26,18 +27,20 @@ export const onLoadMorePopular = (
           pageSize * pageIndex > dataArray.length
             ? dataArray.length
             : pageSize * pageIndex;
-        dispatch({
-          type: actionTypes.POPULAR_LOAD_MORE_SUCCESS,
-          storeName,
-          pageIndex,
-          projectModes: dataArray.slice(0, max),
+        _projectModels(dataArray.slice(0, max), favoriteDao, data => {
+          dispatch({
+            type: actionTypes.POPULAR_LOAD_MORE_SUCCESS,
+            storeName,
+            pageIndex,
+            projectModes: data,
+          });
         });
       }
     }, 500);
   };
 };
 
-export const onLoadPopularData = (storeName, url, pageSize) => {
+export const onLoadPopularData = (storeName, url, pageSize, favoriteDao) => {
   return dispatch => {
     dispatch({
       type: actionTypes.POPULAR_REFRESH,
@@ -53,6 +56,7 @@ export const onLoadPopularData = (storeName, url, pageSize) => {
           storeName,
           data,
           pageSize,
+          favoriteDao,
         );
       })
       .catch(err => {

@@ -9,36 +9,27 @@ export const timeSpans = [
   new TimeSpan('This Month', 'since=monthly'),
 ];
 
-const TrendingDialog = (props,ref) => {
+const TrendingDialog = props => {
+  const {onShow, onDismiss, visible} = props;
   const {onClose, onSelect} = props;
-  const [visible, setVisible] = useState(false);
-
-  useImperativeHandle(ref, () => ({
-    show() {
-      setVisible(true);
-    },
-  }));
-
-  const dismiss = () => {
-    setVisible(false);
-  };
 
   return (
     <Modal transparent={true} visible={visible} onRequestClose={onClose}>
-      <TouchableOpacity style={styles.container} onPress={dismiss}>
+      <TouchableOpacity style={styles.container} onPress={onDismiss}>
         <MaterialIcons size={36} style={styles.arrow} name={'arrow-drop-up'} />
         <View style={styles.content}>
           {timeSpans.map((result, i, arr) => {
             return (
               <TouchableOpacity
+                key={i}
                 onPress={() => onSelect(arr[i])}
                 underlayColor="transparent">
                 <View style={styles.textWrapper}>
                   <Text style={styles.text}>{arr[i].showText}</Text>
-                  {i !== timeSpans.length - 1 ? (
-                    <View style={styles.divider} />
-                  ) : null}
                 </View>
+                {i !== timeSpans.length - 1 ? (
+                  <View style={styles.divider} />
+                ) : null}
               </TouchableOpacity>
             );
           })}
@@ -85,4 +76,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default forwardRef(TrendingDialog);
+export default TrendingDialog;
