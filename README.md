@@ -2,7 +2,7 @@
 
 A Github Trending client based on Github API and built by React Native.
 
-![img](https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577340873.png)
+![img](https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577340873.png/500)
 
 ## Motivation
 
@@ -15,7 +15,6 @@ The project I built is due to my passion in cross-platform app development and R
 3. Ensure emulator is ready or mobile device is connected to your machine.
 4. Run `yarn` or `npm install` 
 5. Run `yarn` or `npm run android`
----
 
 ## The project uses:
 - React Native
