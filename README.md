@@ -2,12 +2,12 @@
 
 A Github Trending client based on Github API and built by React Native.
 
-<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577340873.png" margin-right='20px' width="200">
-<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343211.png" margin-right='20px' width="200"></br>
-<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343222.png" margin-right='20px' width="200">
-<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343230.png" margin-right='20px' width="200"></br>
-<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343243.png" margin-right='20px' width="200">
-<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343246.png" margin-right='20px' width="200">
+<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577340873.png" margin-right='20px' width="200"><img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343211.png" width="200">
+
+<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343222.png" width="200"><img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343230.png" width="200">
+
+<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343243.png" width="200"><img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577343246.png" width="200">
+
 
 ## Motivation
 
