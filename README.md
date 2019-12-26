@@ -2,7 +2,7 @@
 
 A Github Trending client based on Github API and built by React Native.
 
-![img](https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577340873.png/500)
+<img src="https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577340873.png" width="200">
 
 ## Motivation
 
