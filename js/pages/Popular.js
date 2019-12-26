@@ -92,7 +92,10 @@ const PopularTab = props => {
       <PopularItem
         projectModes={item}
         onSelect={() => {
-          NavigationUtil.toPage({projectModes: item}, 'DetailPage');
+          NavigationUtil.toPage(
+            {projectModes: item, flag: FLAG_STORAGE.flag_popular},
+            'DetailPage',
+          );
         }}
         onFavorite={(item, isFavorite) =>
           FavoriteUtil.onFavorite(
@@ -108,6 +111,7 @@ const PopularTab = props => {
 
   return (
     <View style={styles.container}>
+      {console.log('render', popular['Java'])}
       <FlatList
         data={store && store.projectModes}
         renderItem={data => renderItem(data)}
@@ -118,7 +122,7 @@ const PopularTab = props => {
             titleColor={THEME_COLOR}
             colors={[THEME_COLOR]}
             refreshing={store && store.isLoading}
-            onRefresh={() => fetchData()}
+            onRefresh={fetchData}
             tintColor={THEME_COLOR}
           />
         }

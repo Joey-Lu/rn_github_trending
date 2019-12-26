@@ -3,7 +3,10 @@ import {TouchableOpacity} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const BaseItem = props => {
-  const [isFavorite, setIsFavorite] = useState(props.isFavorite);
+  const [isFavorite, setIsFavorite] = useState(props.projectModes.isFavorite);
+  useEffect(() => {
+    setIsFavorite(props.projectModes.isFavorite);
+  }, [props.projectModes]);
 
   const setFavoriteState = val => {
     props.projectModes.isFavorite = val;

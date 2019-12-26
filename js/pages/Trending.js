@@ -94,7 +94,10 @@ const TrendingTab = props => {
       <TrendingItem
         projectModes={item}
         onSelect={() => {
-          NavigationUtil.toPage({projectModes: item}, 'DetailPage');
+          NavigationUtil.toPage(
+            {projectModes: item, flag: FLAG_STORAGE.flag_trend},
+            'DetailPage',
+          );
         }}
         onFavorite={(item, isFavorite) => {
           FavoriteUtil.onFavorite(

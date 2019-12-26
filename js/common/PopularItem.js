@@ -3,12 +3,14 @@ import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import BaseItem from './BaseItem';
 
 const PopularItem = props => {
-  const {projectModes, onSelect, onFavorite} = props;
+  const {onSelect, onFavorite} = props;
+  const [projectModes, setProjectMoedes] = useState(props.projectModes);
   const [item, setItem] = useState(projectModes.item);
 
   useEffect(() => {
     setItem(projectModes.item);
   }, [projectModes]);
+  console.log(projectModes);
 
   return (
     <TouchableOpacity onPress={onSelect}>
@@ -27,11 +29,7 @@ const PopularItem = props => {
             <Text>Start:</Text>
             <Text>{item.stargazers_count}</Text>
           </View>
-          <BaseItem
-            projectModes={projectModes}
-            isFavorite={projectModes.isFavorite}
-            onFavorite={onFavorite}
-          />
+          <BaseItem projectModes={projectModes} onFavorite={onFavorite} />
         </View>
       </View>
     </TouchableOpacity>
