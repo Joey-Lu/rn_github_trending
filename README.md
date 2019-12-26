@@ -2,12 +2,14 @@
 
 A Github Trending client based on Github API and built by React Native.
 
+![img](https://github.com/Joey-Lu/rn_github_trending/blob/master/screenshots/Screenshot_1577340873.png)
+
 ## Motivation
----
+
 The project I built is due to my passion in cross-platform app development and React-related technologies.  
 
 ## How to run
----
+
 1. git clone https://github.com/Joey-Lu/rn_github_trending.git
 2. cd rn_github_trending
 3. Ensure emulator is ready or mobile device is connected to your machine.
